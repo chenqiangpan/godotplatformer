@@ -14,6 +14,13 @@ var is_holding = false
 var is_jumping = false
 
 
+#coyote time
+@onready var Coyote_timer: Timer = $Timer
+var coyote_time = 0.2
+
+func _ready() -> void:
+	Coyote_timer.wait_time = coyote_time
+
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
 	if not is_on_floor():
@@ -21,20 +28,10 @@ func _physics_process(delta: float) -> void:
 
 	# Handle jump.
 	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = JUMP_VELOCITY_LOW
-		press_time = 0.0
-		is_holding = true
-		is_jumping = true
-		audio_stream_player.play()
+		_handle_jump()
 		
 	elif Input.is_action_pressed("jump") and is_holding and is_jumping:
-		press_time += delta
-		if press_time < HOLD_THRESHOLD :
-			velocity.y = lerp(JUMP_VELOCITY_LOW, JUMP_VELOCITY_HIGH, press_time/HOLD_THRESHOLD )
-		else:
-			velocity.y = JUMP_VELOCITY_HIGH
-			is_holding = false
-			is_jumping = false
+		_handle_hold_jump(delta)
 		
 	elif Input.is_action_just_released("jump"):
 		is_holding = false;	
@@ -67,3 +64,29 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
 	move_and_slide()
+	
+	
+	
+	
+func _handle_jump():
+	velocity.y = JUMP_VELOCITY_LOW
+	press_time = 0.0
+	is_holding = true
+	is_jumping = true
+	audio_stream_player.play()	
+	
+func _handle_hold_jump(delta):
+		press_time += delta
+		if press_time < HOLD_THRESHOLD :
+			velocity.y = lerp(JUMP_VELOCITY_LOW, JUMP_VELOCITY_HIGH, press_time/HOLD_THRESHOLD )
+		else:
+			velocity.y = JUMP_VELOCITY_HIGH
+			is_holding = false
+			is_jumping = false
+
+
+
+
+func _on_timer_timeout() -> void:
+	print("coyote is over!")
+ # Replace with function body.
