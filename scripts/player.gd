@@ -16,10 +16,7 @@ var is_jumping = false
 
 #coyote time
 @onready var Coyote_timer: Timer = $Timer
-var coyote_time = 0.2
 
-func _ready() -> void:
-	Coyote_timer.wait_time = coyote_time
 
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
@@ -27,7 +24,7 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 
 	# Handle jump.
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and(is_on_floor() or !Coyote_timer.is_stopped()) :
 		_handle_jump()
 		
 	elif Input.is_action_pressed("jump") and is_holding and is_jumping:
@@ -63,7 +60,14 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
+
+	var was_on_floor = is_on_floor()
+	
 	move_and_slide()
+	
+	if was_on_floor && !is_on_floor():
+		Coyote_timer.start()
+	
 	
 	
 	
