@@ -1,17 +1,25 @@
 extends CharacterBody2D
 
-
+#movement
 const SPEED = 130.0
+
+#animation
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+#audio
+@onready var audio_stream_player: AudioStreamPlayer2D = $AudioStreamPlayer2D
+
+#jump
 const JUMP_VELOCITY_HIGH = -200.0
 const JUMP_VELOCITY_LOW = -150.0
 var HOLD_THRESHOLD = 0.3
-@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var audio_stream_player: AudioStreamPlayer2D = $AudioStreamPlayer2D
-
 var press_time = 0.0 
 var jump_height = JUMP_VELOCITY_LOW
 var is_holding = false
 var is_jumping = false
+
+# attack state
+var attacking = false
 
 
 #coyote time
@@ -33,25 +41,31 @@ func _physics_process(delta: float) -> void:
 	elif Input.is_action_just_released("jump"):
 		is_holding = false;	
 	
+
 	# gets input direction = -1, 0, 1
 	var direction := Input.get_axis("move_left", "move_right")
 	
-	# flip the sprite
-	
+	# flip the sprite	
 	if direction >0:
 		animated_sprite.flip_h = false
 	elif direction <0:
 		animated_sprite.flip_h = true
-		
-	#play animation
-	if is_on_floor():	
-		
-		if direction == 0:
-			animated_sprite.play("idle")
+	
+	#handle attack input 
+	if  Input.is_action_just_pressed("Attack") and not attacking:
+		attacking = true 
+		animated_sprite.play("attack")
+		print("attack")	
+	
+	#play movement animation if not attack
+	if not attacking:
+		if is_on_floor():		
+			if direction == 0:
+				animated_sprite.play("idle")
+			else:
+				animated_sprite.play("run")
 		else:
-			animated_sprite.play("run")
-	else:
-		animated_sprite.play("jump")
+			animated_sprite.play("jump")
 	
 	
 	
@@ -94,3 +108,9 @@ func _handle_hold_jump(delta):
 func _on_timer_timeout() -> void:
 	print("coyote is over!")
  # Replace with function body.
+
+
+func _on_animated_sprite_2d_animation_finished() -> void:
+	if animated_sprite.animation == "attack":
+		attacking = false
+		animated_sprite.play("idle") # Replace with function body.
