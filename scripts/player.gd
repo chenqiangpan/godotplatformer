@@ -3,6 +3,11 @@ extends CharacterBody2D
 #movement
 const SPEED = 130.0
 
+#attack
+const HITBOX_RIGHT_X = 4.5  # X position of the hitbox when facing right
+const HITBOX_LEFT_X = -16.5    # X position of the hitbox when facing left
+
+
 #animation
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -22,10 +27,14 @@ var is_jumping = false
 # attack state
 var attacking = false
 @onready var hitbox_animation: AnimationPlayer = $hitboxAnimation
+@onready var hitbox: Area2D = $hitbox
 
 
 #coyote time
 @onready var Coyote_timer: Timer = $Timer
+
+# Direction handling
+var last_direction = 1 
 
 
 func _physics_process(delta: float) -> void:
@@ -50,8 +59,12 @@ func _physics_process(delta: float) -> void:
 	# flip the sprite	
 	if direction >0:
 		animated_sprite.flip_h = false
+		last_direction = direction
 	elif direction <0:
 		animated_sprite.flip_h = true
+		last_direction = direction
+	
+	update_hitbox_position(direction)
 	
 	#handle attack input 
 	if  Input.is_action_just_pressed("Attack") and not attacking:
@@ -118,3 +131,8 @@ func _on_animated_sprite_2d_animation_finished() -> void:
 	if animated_sprite.animation == "attack":
 		attacking = false
 		animated_sprite.play("idle") # Replace with function body.
+
+func update_hitbox_position(dir: int):
+	if dir == 0:
+		dir = last_direction
+	hitbox.position.x = HITBOX_RIGHT_X if dir > 0 else HITBOX_LEFT_X
