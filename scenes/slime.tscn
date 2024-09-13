@@ -1,8 +1,24 @@
-[gd_scene load_steps=10 format=3 uid="uid://b2c8nmwfm3jpe"]
+[gd_scene load_steps=15 format=3 uid="uid://b2c8nmwfm3jpe"]
 
 [ext_resource type="Texture2D" uid="uid://bais2dx41cxqm" path="res://assets/sprites/slime_green.png" id="1_26ogd"]
 [ext_resource type="Script" path="res://scripts/slime.gd" id="1_iajv7"]
 [ext_resource type="PackedScene" uid="uid://gpo838hrdhre" path="res://scenes/killzone.tscn" id="2_ia2nm"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rrbp4"]
+atlas = ExtResource("1_26ogd")
+region = Rect2(0, 48, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x45xl"]
+atlas = ExtResource("1_26ogd")
+region = Rect2(24, 48, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q50wf"]
+atlas = ExtResource("1_26ogd")
+region = Rect2(48, 48, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7rsr3"]
+atlas = ExtResource("1_26ogd")
+region = Rect2(72, 48, 24, 24)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_w2kmx"]
 atlas = ExtResource("1_26ogd")
@@ -24,6 +40,23 @@ region = Rect2(72, 24, 24, 24)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_rrbp4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x45xl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q50wf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7rsr3")
+}],
+"loop": false,
+"name": &"death",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_w2kmx")
 }, {
 "duration": 1.0,
@@ -36,21 +69,29 @@ animations = [{
 "texture": SubResource("AtlasTexture_gi45x")
 }],
 "loop": true,
-"name": &"default",
+"name": &"idle",
 "speed": 10.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8xs5y"]
 size = Vector2(8, 14)
 
-[node name="Slime" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_30x6q"]
+size = Vector2(24, 19)
+
+[node name="Slime" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 8
 script = ExtResource("1_iajv7")
+metadata/_edit_horizontal_guides_ = [-29.0]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -12)
 sprite_frames = SubResource("SpriteFrames_ostc0")
-autoplay = "default"
-frame_progress = 0.0564088
+animation = &"death"
+autoplay = "idle"
+frame = 3
+frame_progress = 1.0
 
 [node name="killzone" parent="." instance=ExtResource("2_ia2nm")]
 position = Vector2(0, -12)
@@ -58,6 +99,7 @@ position = Vector2(0, -12)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="killzone"]
 position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_8xs5y")
+debug_color = Color(0.905106, 0.273115, 0.356153, 0.42)
 
 [node name="RayCastRight" type="RayCast2D" parent="."]
 position = Vector2(0, -7)
@@ -66,3 +108,9 @@ target_position = Vector2(12, 0)
 [node name="RayCastLeft" type="RayCast2D" parent="."]
 position = Vector2(0, -7)
 target_position = Vector2(-12, 0)
+
+[node name="SlimeCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -9.5)
+shape = SubResource("RectangleShape2D_30x6q")
+
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

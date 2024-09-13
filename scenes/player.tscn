@@ -1,9 +1,11 @@
-[gd_scene load_steps=35 format=3 uid="uid://bvm4djxcf7x7x"]
+[gd_scene load_steps=41 format=3 uid="uid://bvm4djxcf7x7x"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_ewton"]
 [ext_resource type="Texture2D" uid="uid://bngmawq26oh1f" path="res://assets/sprites/knight.png" id="1_gg6xb"]
 [ext_resource type="Texture2D" uid="uid://ch1wulac3hbrr" path="res://assets/sprites/knight_attack.png" id="2_nueww"]
 [ext_resource type="AudioStream" uid="uid://dnwiiubvg0brc" path="res://assets/sounds/jump.wav" id="3_v3fkb"]
+[ext_resource type="AudioStream" uid="uid://hslqw2ravav5" path="res://assets/sounds/swing.wav" id="5_mtqdy"]
+[ext_resource type="PackedScene" uid="uid://bngvr3vhx8heq" path="res://scenes/hitbox.tscn" id="6_m8q8a"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o8tts"]
 atlas = ExtResource("2_nueww")
@@ -143,7 +145,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack",
-"speed": 10.0
+"speed": 15.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -227,6 +229,45 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_u5d6k"]
 radius = 5.0
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aoceb"]
+size = Vector2(16.5, 12)
+
+[sub_resource type="Animation" id="Animation_h6nl3"]
+resource_name = "hitbox_Anim"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("hitbox/CollisionShape2D:disabled")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.133333, 0.733333, 0.766667, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [true, true, false, false, true, true]
+}
+
+[sub_resource type="Animation" id="Animation_avkv5"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("hitbox/CollisionShape2D:disabled")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ds4sa"]
+_data = {
+"RESET": SubResource("Animation_avkv5"),
+"hitbox_Anim": SubResource("Animation_h6nl3")
+}
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 5
 collision_layer = 2
@@ -244,13 +285,31 @@ frame_progress = 1.0
 position = Vector2(0, -5)
 shape = SubResource("CircleShape2D_u5d6k")
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+[node name="Audio_Jump" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("3_v3fkb")
+bus = &"SFX"
+
+[node name="Audio_Attack" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_mtqdy")
 bus = &"SFX"
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 0.25
 one_shot = true
+
+[node name="hitbox" parent="." instance=ExtResource("6_m8q8a")]
+position = Vector2(6.25, -7)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
+position = Vector2(4.5, 0)
+shape = SubResource("RectangleShape2D_aoceb")
+disabled = true
+debug_color = Color(0.893794, 0.189652, 0.643311, 0.42)
+
+[node name="hitboxAnimation" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_ds4sa")
+}
 
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

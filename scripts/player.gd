@@ -7,7 +7,8 @@ const SPEED = 130.0
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 #audio
-@onready var audio_stream_player: AudioStreamPlayer2D = $AudioStreamPlayer2D
+@onready var audio_jump: AudioStreamPlayer2D = $Audio_Jump
+@onready var audio_attack: AudioStreamPlayer2D = $Audio_Attack
 
 #jump
 const JUMP_VELOCITY_HIGH = -200.0
@@ -20,6 +21,7 @@ var is_jumping = false
 
 # attack state
 var attacking = false
+@onready var hitbox_animation: AnimationPlayer = $hitboxAnimation
 
 
 #coyote time
@@ -54,8 +56,10 @@ func _physics_process(delta: float) -> void:
 	#handle attack input 
 	if  Input.is_action_just_pressed("Attack") and not attacking:
 		attacking = true 
+		hitbox_animation.play("hitbox_Anim")
 		animated_sprite.play("attack")
-		print("attack")	
+		audio_attack.play()
+		
 	
 	#play movement animation if not attack
 	if not attacking:
@@ -91,7 +95,7 @@ func _handle_jump():
 	press_time = 0.0
 	is_holding = true
 	is_jumping = true
-	audio_stream_player.play()	
+	audio_jump.play()	
 	
 func _handle_hold_jump(delta):
 		press_time += delta

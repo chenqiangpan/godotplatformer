@@ -374,6 +374,12 @@ autowrap_mode = 2
 [node name="Slime" parent="." instance=ExtResource("6_3yoty")]
 position = Vector2(372, 129)
 
+[node name="Slime2" parent="." instance=ExtResource("6_3yoty")]
+position = Vector2(427.16, 129)
+
+[node name="Slime3" parent="." instance=ExtResource("6_3yoty")]
+position = Vector2(476.385, 129)
+
 [node name="Player" parent="." instance=ExtResource("1_4hfbv")]
 position = Vector2(79, 77)
 
